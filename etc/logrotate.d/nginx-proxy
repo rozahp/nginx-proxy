@@ -1,0 +1,15 @@
+/var/log/nginx-proxy/*.log {
+	daily
+	su ubuntu ubuntu
+	missingok
+	rotate 31
+	notifempty
+	nocompress
+	sharedscripts
+	postrotate
+		[ ! -f /var/run/nginx.pid ] || kill -USR1 `cat /var/run/nginx.pid`
+	endscript
+	create 0644 ubuntu ubuntu
+}
+
+

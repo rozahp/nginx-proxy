@@ -1,0 +1,58 @@
+server {
+
+    ##
+    ## Block Bad Countries
+    ##
+
+    if ($allowed_country = no) {
+        return 443;
+        break;
+    }
+
+    listen 80;
+    server_name myserver.mydomain.tld;
+    return 301 https://$host$request_uri;
+}
+
+server {
+
+    ##
+    ## Block Bad Countries
+    ##
+
+    if ($allowed_country = no) {
+        return 443;
+        break;
+    }
+
+    listen 443 ssl http2;
+    server_name myserver.mydomain.tld;
+
+    ssl_certificate /etc/letsencrypt/live/myserver.mydomain.tld/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/myserver.mydomain.tld/privkey.pem;
+
+    ssl_dhparam /etc/nginx/ssl/dhparam.pem;
+    ssl on;
+
+    ##
+    ## SECURITY HEADERS
+    ##
+
+    add_header X-Frame-Options SAMEORIGIN;
+    add_header X-Content-Type-Options nosniff;
+    add_header X-XSS-Protection "1; mode=block";
+    add_header Content-Security-Policy "frame-ancestors 'self'";
+    #add_header Content-Security-Policy "frame-ancestors 'none'";
+
+    ##
+    ## LOCATIONS
+    ##
+
+    root /var/www/myserver.mydomain.tld;
+    index index.html;
+    
+    location / {    
+      try_files $uri $uri/ =445;
+    }
+}
+
